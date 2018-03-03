@@ -21,4 +21,4 @@ In the future, I may add paths using the same noise function to mark where the p
 ![buildings2](Images/buildings2.png)
 ![city](Images/city2.png)
 ![entrance](Images/entrance.png)
-![interior](Images/interior/png)
+![interior](Images/interior.png)
