@@ -1,48 +1,24 @@
 
-# Project 5: Shape Grammar
+# Procedural City Spawner
 
-For this assignment you'll be building directly off of the L-system code you
-wrote last week.
+Generates a city using [Eternal Temple](https://www.unrealengine.com/marketplace/eternal-temple) assets. Made entirely using Unreal Engine’s C++ API.  
 
-**Goal:** to model an urban environment using a shape grammar.
+For source files, see Source/ModularTown/ModularBuilding, GrammarShape, CitySpawner, and SimplexNoise.  
 
-**Note:** We’re well aware that a nice-looking procedural city is a lot of work for a single week. Focus on designing a nice building grammar. The city layout strategies outlined in class (the extended l-systems) are complex and not expected. We will be satisfied with something reasonably simple, just not a uniform grid!
+## Grammar Design
+Starts off by creating a foundation for the building. Can either be a standalone room, or divide into a central room with 1-4 adjacent rooms. Rooms keep track of where the adjacent room is or how many adjacent rooms there are if it is the central room.  
 
-## Symbol Node (5 points)
-Modify your symbol node class to include attributes necessary for rendering, such as
-- Associated geometry instance
-- Position
-- Scale
-- Anything else you may need
+Each room then generates a wall and a column at the right edge of the wall for continuity. The transform is generated for each wall where there is no adjacent room. There is a random 1/4 chance that the wall is an entrance.  
 
-## Grammar design (55 points)
-- Design at least five shape grammar rules for producing procedural buildings. Your buildings should vary in geometry and decorative features (beyond just differently-scaled cubes!). At least some of your rules should create child geometry that is in some way dependent on its parent’s state. (20 points)
-    - Eg. A building may be subdivided along the x, y, or z axis into two smaller buildings
-    - Some of your rules must be designed to use some property about its location. (10 points)
-    - Your grammar should have some element of variation so your buildings are non-deterministic.  Eg. your buildings sometimes subdivide along the x axis, and sometimes the y. (10 points)   
-- Write a renderer that will interpret the results of your shape grammar parser and adds the appropriate geometry to your scene for each symbol in your set. (10 points)
+Finally, the room generates a roof with the transform adjusted based on adjacent rooms. The central room has a special type of roof unless there is only one adjacent room.  
 
-## Create a city (30 points)
-- Add a ground plane or some other base terrain to your scene (0 points, come on now)
-- Using any strategy you’d like, procedurally generate features that demarcate your city into different areas in an interesting and plausible way (Just a uniform grid is neither interesting nor plausible). (20 points)
-    - Suggestions: roads, rivers, lakes, parks, high-population density
-    - Note, these features don’t have to be directly visible, like high-population density, but they should somehow be visible in the appearance or arrangement of your buildings. Eg. High population density is more likely to generate taller buildings
-- Generate buildings throughout your city, using information about your city’s features. Color your buildings with a method that uses some aspect of its state. Eg. Color buildings by height, by population density, by number of rules used to generate it. (5 points)
-- Document your grammar rules and general approach in the readme. (5 points)
-- ???
-- Profit.
+## City Generation
+The city uses a 2D Simplex noise function to represent common areas where people walk around. With that knowledge, buildings are placed in high, but not too high density areas (where people walk around but not in the middle of where everybody is walking around). The noise function is sampled at uniform points on a grid, where it is then checked to see if it lies in the threshold. If so, a building is spawned with its scale proportional to the value of the noise function and a random up-axis rotation applied.  
 
-## Make it interesting (10)
-Experiment! Make your city a work of art.
+In the future, I may add paths using the same noise function to mark where the player and AI should move. Buildings could also be more complex with additional grammar rules such as bridges between buildings or large temples with multiple interior floors. I made sure to program all transformations relative to a grid size (600 for this pack). The meshes can easily be replaced with any modular mesh components for walls, entrances, etc to create a variety of styles. Lastly, I plan to integrate the city generation with my existing game project, which would add height variation, dynamic terrain textures, and procedural foliage.  
 
-## Warnings:
-If you're not careful with how many draw calls you make in a single `tick()`,
-you can very easily blow up your CPU with this assignment. As with the L-system,
-try to group geometry into one VBO so the run-time of your program outside of
-the time spent generating the city is fast.
-
-## Suggestions for the overachievers:
-Go for a very high level of decorative detail!
-Place buildings with a strategy such that buildings have doors and windows that are always accessible.
-Generate buildings with coherent interiors
-If dividing your city into lots, generate odd-shaped lots and create building meshes that match their shape .i.e. rather than working with cubes, extrude upwards from the building footprints you find to generate a starting mesh to subdivide rather than starting with platonic geometry.
+![buildings1](Images/buildings1.png)
+![buildings2](Images/buildings2.png)
+![city](Images/city2.png)
+![entrance](Images/entrance.png)
+![interior](Images/interior/png)
